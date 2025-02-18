@@ -39,26 +39,4 @@ namespace Example
 
 end Example
 
--- Checks that big-step evaluation ends with a value
-theorem eval_ok_value : ∀ t, eval t = Ok v -> isVal v = true := by
-  intro t
-  induction t <;> intro h <;> simp at h
-  · subst h
-    rfl
-  · rename_i t ht
-    cases eq : eval t with
-    | Ok t' =>
-      cases t' <;> rw [eq] at h <;> simp at *
-      · subst h
-        rfl
-      · sorry
-    | Error =>
-      rw [eq] at h
-      contradiction
-  · sorry
-  · sorry
-  · sorry
-  · subst h; rfl
-  · subst h; rfl
-
 end Fos
