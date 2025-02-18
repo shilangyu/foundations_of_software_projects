@@ -36,7 +36,6 @@ Check whether a term is a boolean value.
 -/
 def isBoolVal : Term -> Bool
   | Term.t_true | Term.t_false => true
-  -- TODO: should iszero? be a boolean value?
   | _ => false
 
 /-
