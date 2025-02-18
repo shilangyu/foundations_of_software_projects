@@ -15,8 +15,8 @@ inductive IsNumericalVal : Term -> Prop where
 Inductive definition of `isBoolVal`.
 -/
 inductive IsBoolVal : Term -> Prop where
-  | true_val : IsBoolVal Term.t_true
-  | false_val : IsBoolVal Term.t_false
+  | b_true : IsBoolVal Term.t_true
+  | b_false : IsBoolVal Term.t_false
 
 /-
 Inductive definition of `isVal`.
@@ -81,7 +81,7 @@ notation:50 t " ~~>* " t' => Smallsteps t t'
 theorem num_val_true
   (h : IsNumericalVal t) :
   isNumericalVal t = true := by
-  sorry
+  induction h <;> trivial
 
 /-
 Evaluating a numerical value yields the same result as the value itself.
@@ -89,7 +89,7 @@ Evaluating a numerical value yields the same result as the value itself.
 theorem num_val_eval
   (h : IsNumericalVal t) :
   eval t = EvalResult.Ok t := by
-  sorry
+  induction h <;> simp [*]
 
 /-
 Evaluating a boolean value yields the same result as the value itself.
@@ -97,7 +97,7 @@ Evaluating a boolean value yields the same result as the value itself.
 theorem bool_val_eval
   (h : IsBoolVal t) :
   eval t = EvalResult.Ok t := by
-  sorry
+  induction h <;> trivial
 
 /-
 Evaluating a value yields the same result as the value itself.
@@ -105,7 +105,7 @@ Evaluating a value yields the same result as the value itself.
 theorem val_eval
   (h : IsVal t) :
   eval t = EvalResult.Ok t := by
-  sorry
+  cases h <;> simp [num_val_eval, bool_val_eval, *]
 
 /-
 Reducing a term preserves the result of evaluation.
@@ -113,7 +113,7 @@ Reducing a term preserves the result of evaluation.
 theorem smallstep_eval
   (hr : t ~~> t') :
   eval t = eval t' := by
-  sorry
+  induction hr <;> simp [num_val_eval, *]
 
 /-
 A numerical value cannot be further reduced.
@@ -121,7 +121,8 @@ A numerical value cannot be further reduced.
 theorem smallstep_nval_absurd
   (hv : IsNumericalVal t) :
   (t ~~> t') -> False := by
-  sorry
+  intro hs
+  induction hs <;> cases hv <;> contradiction
 
 /-
 A boolean value cannot be further reduced.
@@ -130,9 +131,7 @@ theorem smallstep_bval_absurd
   (hv : IsBoolVal t) :
   (t ~~> t') -> False := by
   intro hr
-  cases hv
-  case b_true => cases hr
-  case b_false => cases hr
+  cases hv <;> cases hr
 
 /-
 A value cannot be further reduced.
@@ -140,13 +139,21 @@ A value cannot be further reduced.
 theorem smallstep_val_absurd
   (hv : IsVal t) :
   (t ~~> t') -> False := by
-  sorry
+  cases hv
+  · apply smallstep_nval_absurd
+    assumption
+  · apply smallstep_bval_absurd
+    assumption
 
 theorem smallsteps_val
   (hv : IsVal t)
   (hr : t ~~>* t') :
   t' = t := by
-  sorry
+  induction hr
+  · rfl
+  case step h1 _ _ =>
+    have t := smallstep_val_absurd hv h1
+    contradiction
 
 /-
 If a term can be reduced to a value, then evaluating the term yields the same result.
@@ -155,6 +162,9 @@ theorem smallsteps_eval
   (hr : t ~~>* t')
   (hv : IsVal t') :
   eval t = EvalResult.Ok t' := by
-  sorry
+  induction hr
+  · exact val_eval hv
+  case step h1 _ h2 =>
+    rw [smallstep_eval h1, h2 hv]
 
 end Fos
