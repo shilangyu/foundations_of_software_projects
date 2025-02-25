@@ -17,15 +17,15 @@ def eval : Term -> EvalResult
     | Ok Term.t_false => eval t3
     | _ => Error
   | Term.t_succ t1 => match eval t1 with
-    | Ok t1' => Ok (Term.t_succ t1')
+    | Ok nv => if isNumericalVal nv then Ok (Term.t_succ nv) else Error
     | _ => Error
   | Term.t_pred t1 => match eval t1 with
     | Ok Term.t_zero => Ok Term.t_zero
-    | Ok (Term.t_succ nv) => Ok nv
+    | Ok (Term.t_succ nv) => if isNumericalVal nv then Ok nv else Error
     | _ => Error
   | Term.t_iszero t1 => match eval t1 with
     | Ok Term.t_zero => Ok Term.t_true
-    | Ok (Term.t_succ _) => Ok Term.t_false
+    | Ok (Term.t_succ nv) => if isNumericalVal nv then Ok Term.t_false else Error
     | _ => Error
 
 

@@ -89,7 +89,7 @@ Evaluating a numerical value yields the same result as the value itself.
 theorem num_val_eval
   (h : IsNumericalVal t) :
   eval t = EvalResult.Ok t := by
-  induction h <;> simp [*]
+  induction h <;> simp [num_val_true, *]
 
 /-
 Evaluating a boolean value yields the same result as the value itself.
@@ -113,7 +113,7 @@ Reducing a term preserves the result of evaluation.
 theorem smallstep_eval
   (hr : t ~~> t') :
   eval t = eval t' := by
-  induction hr <;> simp [num_val_eval, *]
+  induction hr <;> simp [num_val_true, num_val_eval, *]
 
 /-
 A numerical value cannot be further reduced.
