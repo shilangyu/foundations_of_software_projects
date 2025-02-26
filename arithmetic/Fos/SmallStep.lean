@@ -97,7 +97,7 @@ Evaluating a boolean value yields the same result as the value itself.
 theorem bool_val_eval
   (h : IsBoolVal t) :
   eval t = EvalResult.Ok t := by
-  induction h <;> trivial
+  cases h <;> trivial
 
 /-
 Evaluating a value yields the same result as the value itself.
