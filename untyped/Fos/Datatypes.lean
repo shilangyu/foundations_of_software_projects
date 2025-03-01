@@ -1,25 +1,25 @@
 import Fos.Term
 import Fos.Syntax
 import Fos.Reduce
--- Or one of the following, use the one you like best
--- import Fos.Parser
--- import Fos.NiceParser
+import Fos.NiceParser
 namespace Fos
 
+open Fos.NiceParser
+
 def btrue : Term :=
-  sorry
+  ```λt -> λf -> t```
 
 def bfalse : Term :=
-  sorry
+  ```λt -> λf -> f```
 
 def or : Term :=
-  sorry
+  ```λa -> λb -> a {btrue} b```
 
 def and : Term :=
-  sorry
+  ```λa -> λb -> a b {bfalse}```
 
 def not : Term :=
-  sorry
+  ```λb -> b{bfalse}{btrue}```
 
 theorem boolean_expr_simple :=
   sorry
