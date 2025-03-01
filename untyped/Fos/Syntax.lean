@@ -20,20 +20,16 @@ notation "λ" n " => " t => Syntax.s_lam n t
 notation t1 "(" t2 ")" => Syntax.s_app t1 t2
 notation "{" t "}" => Syntax.s_value t
 
-def lookupName (n : String) : List String -> Option Nat := sorry
--- Define the lookup function
+def lookupName (n : String) : List String -> Option Nat := List.idxOf? n
 
 /-
 Elaborate the `Syntax` to the debruijn-indexed `Term` given a context of variable names.
 -/
 def elaborate' (ctx : List String) : Syntax -> Term
 | Syntax.s_var n => Term.t_var (lookupName n ctx).get!
-| Syntax.s_lam n t =>
-  sorry
-| Syntax.s_app t1 t2 =>
-  sorry
-| Syntax.s_value t =>
-  sorry
+| Syntax.s_lam n t => Term.t_abs (elaborate' (n :: ctx) t)
+| Syntax.s_app t1 t2 => Term.t_app (elaborate' ctx t1) (elaborate' ctx t2)
+| Syntax.s_value t => t
 
 def elaborate (s : Syntax) : Term :=
   elaborate' [] s
