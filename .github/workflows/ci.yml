@@ -17,3 +17,7 @@ jobs:
       - uses: leanprover/lean-action@v1
         with:
           lake-package-directory: arithmetic
+
+      - uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: untyped
