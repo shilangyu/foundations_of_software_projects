@@ -52,6 +52,6 @@ notation:70 t "[" u "]" => Term.subst_zero t u
 -- Church numeral 3: λs. λz. s (s (s z))
 def three : Term := .t_abs -- λs.
   (.t_abs -- λz.
-    (.t_app (.t_var 1) (.t_app (.t_var 1) (.t_app (.t_var 1) (.t_var 1))))) -- s (s (s z))
+    (.t_app (.t_var 1) (.t_app (.t_var 1) (.t_app (.t_var 1) (.t_var 0))))) -- s (s (s z))
 
 end Fos
