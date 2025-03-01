@@ -20,7 +20,7 @@ notation "λ" n " => " t => Syntax.s_lam n t
 notation t1 "(" t2 ")" => Syntax.s_app t1 t2
 notation "{" t "}" => Syntax.s_value t
 
-def lookupName (n : String) : List String -> Option Nat
+def lookupName (n : String) : List String -> Option Nat := sorry
 -- Define the lookup function
 
 /-
