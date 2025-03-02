@@ -19,7 +19,7 @@ def and : Term :=
   ```λa -> λb -> a b {bfalse}```
 
 def not : Term :=
-  ```λb -> b{bfalse}{btrue}```
+  ```λb -> b {bfalse} {btrue}```
 
 theorem boolean_expr_simple :=
   sorry
@@ -27,13 +27,22 @@ theorem boolean_expr_simple :=
 -- Arithmetic
 
 def iszero :=
-  sorry
+  ```λn -> n (λx -> {bfalse}) {btrue}```
 
 theorem iszero_zero : elaborate ({iszero}({zero})) ~~>* btrue := by
-  sorry
+  calc
+    _ ~~> ```{zero} (λx -> {bfalse}) {btrue}``` := by constructor
+    _ ~~> ```(λz -> z) {btrue}``` := by repeat constructor
+    _ ~~> ```{btrue}``` := by constructor
 
 theorem iszero_succ : elaborate (λ "n" => {iszero}({succ}("n"))) ~~>* elaborate (λ "n" => {bfalse}) := by
-  sorry
+  apply reduce_many_abs
+  calc
+    _ ~~> (elaborate' ["n"] (({succ})("n")(λ "x" => {bfalse})({btrue})))  := by constructor
+    _ ~~> (elaborate' ["n"] ((λ "s" => λ "z" => "s"("n"("s")("z")))(λ "x" => {bfalse})({btrue})))  := by repeat constructor
+    _ ~~> (elaborate' ["n"] ((λ "z" => (λ "x" => {bfalse})("n"(λ "x" => {bfalse})("z")))({btrue})))  := by repeat constructor
+    _ ~~> (elaborate' ["n"] ((λ "x" => {bfalse})("n"(λ "x" => {bfalse})({btrue}))))  := by constructor
+    _ ~~> bfalse := by constructor
 
 -- Fold lists
 
