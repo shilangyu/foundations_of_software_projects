@@ -92,9 +92,24 @@ theorem flist_isnil_cons :
     _ ~~> bfalse := by repeat constructor
 
 def flist_head :=
-  sorry
+  ```λp -> p {btrue}```
 
 theorem flist_head_cons : elaborate (λ "h" => λ "t" => {flist_head}({flist_cons}("h")("t"))) ~~>* elaborate (λ "h" => λ "t" => "h") := by
-  sorry
+  apply reduce_many_abs
+  apply reduce_many_abs
+  calc
+    _ ~~> elaborate' ["t", "h"] ({flist_cons}("h")("t")({btrue})) := by repeat constructor
+    _ ~~> elaborate' ["t", "h"] ((λ "c" => {pair}("h")("c"))("t")({btrue})) := by
+      apply Reduce.app1
+      apply Reduce.app1
+      apply Reduce.appAbs
+    _ ~~> elaborate' ["t", "h"] ({pair}("h")("t")({btrue})) := by
+      apply Reduce.app1
+      apply Reduce.appAbs
+    _ ~~> elaborate' ["t", "h"] ((λ "b" => λ "f" => "f"("h")("b"))("t")({btrue})) := by repeat constructor
+    _ ~~> elaborate' ["t", "h"] ((λ "f" => "f"("h")("t"))({btrue})) := by repeat constructor
+    _ ~~> elaborate' ["t", "h"] ({btrue}("h")("t")) := by repeat constructor
+    _ ~~> elaborate' ["t", "h"] ((λ "f" => "h")("t")) := by repeat constructor
+    _ ~~> elaborate' ["t", "h"] ("h") := by repeat constructor
 
 end Fos
