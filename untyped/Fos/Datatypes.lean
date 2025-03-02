@@ -29,7 +29,6 @@ theorem boolean_expr_simple : ```{not} ({and} {btrue} {bfalse})``` ~~>* btrue :=
       apply Reduce.app1
       apply Reduce.app1
       apply Reduce.appAbs
-      -- Q: why does repeat constructor not work here?
     _ ~~> ```(λf -> {bfalse}) {bfalse} {bfalse} {btrue}``` := by repeat constructor
     _ ~~> ```{bfalse} {bfalse} {btrue}``` := by repeat constructor
     _ ~~> ```(λf -> f) {btrue}``` := by repeat constructor
