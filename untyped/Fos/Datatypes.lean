@@ -25,10 +25,7 @@ theorem boolean_expr_simple : ```{not} ({and} {btrue} {bfalse})``` ~~>* btrue :=
   calc
     _ ~~> ```{and} {btrue} {bfalse} {bfalse} {btrue}``` := by constructor
     _ ~~> ```(λb -> {btrue} b {bfalse}) {bfalse} {bfalse} {btrue}``` := by repeat constructor
-    _ ~~> ```{btrue} {bfalse} {bfalse} {bfalse} {btrue}``` := by
-      apply Reduce.app1
-      apply Reduce.app1
-      apply Reduce.appAbs
+    _ ~~> ```{btrue} {bfalse} {bfalse} {bfalse} {btrue}``` := by repeat constructor
     _ ~~> ```(λf -> {bfalse}) {bfalse} {bfalse} {btrue}``` := by repeat constructor
     _ ~~> ```{bfalse} {bfalse} {btrue}``` := by repeat constructor
     _ ~~> ```(λf -> f) {btrue}``` := by repeat constructor
@@ -46,13 +43,12 @@ theorem iszero_zero : elaborate ({iszero}({zero})) ~~>* btrue := by
     _ ~~> ```{btrue}``` := by constructor
 
 theorem iszero_succ : elaborate (λ "n" => {iszero}({succ}("n"))) ~~>* elaborate (λ "n" => {bfalse}) := by
-  apply reduce_many_abs
   calc
-    _ ~~> (elaborate' ["n"] (({succ})("n")(λ "x" => {bfalse})({btrue})))  := by constructor
-    _ ~~> (elaborate' ["n"] ((λ "s" => λ "z" => "s"("n"("s")("z")))(λ "x" => {bfalse})({btrue})))  := by repeat constructor
-    _ ~~> (elaborate' ["n"] ((λ "z" => (λ "x" => {bfalse})("n"(λ "x" => {bfalse})("z")))({btrue})))  := by repeat constructor
-    _ ~~> (elaborate' ["n"] ((λ "x" => {bfalse})("n"(λ "x" => {bfalse})({btrue}))))  := by constructor
-    _ ~~> bfalse := by constructor
+    _ ~~> ```λn -> ({iszero} (λs -> λz -> s (n s z)))``` := by repeat constructor
+    _ ~~> ```λn -> ((λs -> λz -> s (n s z)) (λx -> {bfalse}) {btrue})``` := by repeat constructor
+    _ ~~> ```λn -> ((λz -> (λx -> {bfalse}) (n (λx -> {bfalse}) z)) {btrue})``` := by repeat constructor
+    _ ~~> ```λn -> ((λz -> {bfalse}) {btrue})``` := by repeat constructor
+    _ ~~> ```λn -> {bfalse}``` := by repeat constructor
 
 -- Fold lists
 
@@ -76,39 +72,28 @@ theorem flist_isnil_nil : elaborate ({flist_isnil}({flist_nil})) ~~>* btrue := b
 theorem flist_isnil_cons :
   elaborate (λ "h" => λ "t" => {flist_isnil}({flist_cons}("h")("t")))
   ~~>* elaborate (λ "h" => λ "t" => {bfalse}) := by
-  apply reduce_many_abs
-  apply reduce_many_abs
   calc
-    _ ~~> ((elaborate' ["t", "h"] ({flist_cons}("h")("t"))).t_app ```λa -> λb -> {bfalse}```) := by constructor
-    _ ~~> ((elaborate' ["t", "h"] ((λ "c" => {pair}("h")("c"))("t"))).t_app ```λa -> λb -> {bfalse}```) := by repeat constructor
-    _ ~~> ((elaborate' ["t", "h"] ({pair}("h")("t"))).t_app ```λa -> λb -> {bfalse}```) := by
-      apply Reduce.app1
-      apply Reduce.appAbs
-    _ ~~> ((elaborate' ["t", "h"] ((λ "b" => λ "f" => "f"("h")("b"))("t"))).t_app ```λa -> λb -> {bfalse}```) := by repeat constructor
-    _ ~~> ((elaborate' ["t", "h"] ((λ "f" => "f"("h")("t")))).t_app ```λa -> λb -> {bfalse}```) := by repeat constructor
-    _ ~~> (elaborate' ["t", "h"] ((λ "a" => λ "b" => {bfalse})("h")("t"))) := by repeat constructor
-    _ ~~> (elaborate' ["t", "h"] ((λ "b" => {bfalse})("t"))) := by repeat constructor
-    _ ~~> bfalse := by repeat constructor
+    _ ~~> ```λh -> λt -> {flist_cons} h t (λa -> λb -> {bfalse})``` := by repeat constructor
+    _ ~~> ```λh -> λt -> (λc -> {pair} h c) t (λa -> λb -> {bfalse})``` := by repeat constructor
+    _ ~~> ```λh -> λt -> {pair} h t (λa -> λb -> {bfalse})``` := by repeat constructor
+    _ ~~> ```λh -> λt -> (λb -> λf -> f h b) t (λa -> λb -> {bfalse})``` := by repeat constructor
+    _ ~~> ```λh -> λt -> (λf -> f h t) (λa -> λb -> {bfalse})``` := by repeat constructor
+    _ ~~> ```λh -> λt -> (λa -> λb -> {bfalse}) h t``` := by repeat constructor
+    _ ~~> ```λh -> λt -> (λb -> {bfalse}) t``` := by repeat constructor
+    _ ~~> ```λh -> λt -> {bfalse}``` := by repeat constructor
 
 def flist_head :=
   ```λp -> p {btrue}```
 
 theorem flist_head_cons : elaborate (λ "h" => λ "t" => {flist_head}({flist_cons}("h")("t"))) ~~>* elaborate (λ "h" => λ "t" => "h") := by
-  apply reduce_many_abs
-  apply reduce_many_abs
   calc
-    _ ~~> elaborate' ["t", "h"] ({flist_cons}("h")("t")({btrue})) := by repeat constructor
-    _ ~~> elaborate' ["t", "h"] ((λ "c" => {pair}("h")("c"))("t")({btrue})) := by
-      apply Reduce.app1
-      apply Reduce.app1
-      apply Reduce.appAbs
-    _ ~~> elaborate' ["t", "h"] ({pair}("h")("t")({btrue})) := by
-      apply Reduce.app1
-      apply Reduce.appAbs
-    _ ~~> elaborate' ["t", "h"] ((λ "b" => λ "f" => "f"("h")("b"))("t")({btrue})) := by repeat constructor
-    _ ~~> elaborate' ["t", "h"] ((λ "f" => "f"("h")("t"))({btrue})) := by repeat constructor
-    _ ~~> elaborate' ["t", "h"] ({btrue}("h")("t")) := by repeat constructor
-    _ ~~> elaborate' ["t", "h"] ((λ "f" => "h")("t")) := by repeat constructor
-    _ ~~> elaborate' ["t", "h"] ("h") := by repeat constructor
+    _ ~~> ```λh -> λt -> {flist_cons} h t {btrue}``` := by repeat constructor
+    _ ~~> ```λh -> λt -> (λb -> {pair} h b) t {btrue}``` := by repeat constructor
+    _ ~~> ```λh -> λt -> {pair} h t {btrue}``` := by repeat constructor
+    _ ~~> ```λh -> λt -> (λb -> λf -> f h b) t {btrue}``` := by repeat constructor
+    _ ~~> ```λh -> λt -> (λf -> f h t) {btrue}``` := by repeat constructor
+    _ ~~> ```λh -> λt -> {btrue} h t``` := by repeat constructor
+    _ ~~> ```λh -> λt -> (λf -> h) t``` := by repeat constructor
+    _ ~~> ```λh -> λt -> h``` := by repeat constructor
 
 end Fos
