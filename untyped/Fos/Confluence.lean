@@ -210,14 +210,29 @@ def ParReduceMany.confluence_left
   (h1 : t ~~>p* t1)
   (h2 : t ~~>p t2) :
   ∃ u, (t1 ~~>p u) ∧ (t2 ~~>p* u) := by
-  -- exact ⟨1, ParReduce.triangle h2⟩
-  sorry
+  induction h1 with
+  | refl => exact ⟨t2, h2, Relation.ReflTransGen.refl⟩
+  | tail h1 h1' ih =>
+    have ⟨u, h1u, h2u⟩ := ih
+    have ⟨v, h1v, h2v⟩ := ParReduce.confluence h1' h1u
+    use v
+    apply And.intro
+    · assumption
+    · exact Relation.ReflTransGen.tail h2u h2v
 
 def ParReduceMany.confluence
   (h1 : t ~~>p* t1)
   (h2 : t ~~>p* t2) :
   ∃ u, (t1 ~~>p* u) ∧ (t2 ~~>p* u) := by
-  sorry
+  induction h2 with
+  | refl => exact ⟨t1, Relation.ReflTransGen.refl, h1⟩
+  | tail h2 h2' ih =>
+    have ⟨v, h1v, h2v⟩ := ih
+    have ⟨u, h1u, h2u⟩ := ParReduceMany.confluence_left h2v h2'
+    use u
+    apply And.intro
+    · exact Relation.ReflTransGen.tail h1v h1u
+    · assumption
 
 /-
 ## `~~>*` and `~~>p*` are Equivalent
@@ -272,7 +287,21 @@ Now, prove that we can go from `~~>p` to `~~>*`.
 theorem ParReduce.toReduceMany
   (h : t ~~>p t') :
   t ~~>* t' := by
-  sorry
+  induction h with
+  | var => constructor
+  | beta h1 h2 ih1 ih2 =>
+    rename_i t t' u u'
+    calc
+      _ ~~>* t'.t_abs.t_app u := by simp [ReduceMany.ctx_app1, ReduceMany.ctx_abs, *]
+      _ ~~>* t'.t_abs.t_app u' := by simp [ReduceMany.ctx_app2, *]
+      _ ~~> t'[u'] := by constructor
+  | ctx_abs h ih =>
+    exact ReduceMany.ctx_abs ih
+  | ctx_app h1 h2 ih1 ih2 =>
+    rename_i t t' u u'
+    calc
+      _ ~~>* t'.t_app u := by simp [ReduceMany.ctx_app1, *]
+      _ ~~>* t'.t_app u' := by simp [ReduceMany.ctx_app2, *]
 
 /-
 Then, it follows that `~~>*` can be converted to `~~>p*`.
