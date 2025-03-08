@@ -229,7 +229,7 @@ First, we can go from `~~>` to `~~>p`.
 theorem Reduce.toParReduce
   (h : t ~~> t') :
   t ~~>p t' := by
-  sorry
+  induction h <;> constructor <;> repeat (first | assumption | exact ParReduce.refl)
 
 /-
 Then, we show that we can go from `~~>` to `~~>p*`.
@@ -239,7 +239,12 @@ The following lemmas are useful for the proof.
 theorem ReduceMany.ctx_abs
   (h : t ~~>* t') :
   .t_abs t ~~>* .t_abs t' := by
-  sorry
+  induction h with
+  | refl => constructor
+  | tail h ht ih =>
+    apply Relation.ReflTransGen.tail ih
+    constructor
+    assumption
 
 theorem ReduceMany.ctx_app1
   (h1 : t1 ~~>* t1') :
@@ -275,7 +280,11 @@ Then, it follows that `~~>*` can be converted to `~~>p*`.
 theorem ReduceMany.toParReduceMany
   (h : t ~~>* t') :
   t ~~>p* t' := by
-  sorry
+  induction h with
+  | refl => constructor
+  | tail h ht ih =>
+    apply Relation.ReflTransGen.tail ih
+    apply Reduce.toParReduce ht
 
 /-
 Finally, we can show that `~~>p*` can be converted to `~~>*`, and therefore the equivalence.
@@ -283,7 +292,11 @@ Finally, we can show that `~~>p*` can be converted to `~~>*`, and therefore the 
 theorem ParReduceMany.toReduceMany
   (h : t ~~>p* t') :
   t ~~>* t' := by
-  sorry
+  induction h with
+  | refl => constructor
+  | tail h ht ih =>
+    have hp := ParReduce.toReduceMany ht
+    exact Relation.ReflTransGen.trans ih hp
 
 /-
 ## Final Result: `~~>*` is Confluent!
@@ -291,7 +304,13 @@ theorem ParReduceMany.toReduceMany
 With all the established results, we can finally prove that `~~>*` is confluent. Finish the last piece of this puzzle!
 -/
 theorem ReduceMany.confluence : Confluence := by
-  sorry
+  unfold Confluence
+  intro t t1 t2 h1 h2
+  have h1' := ReduceMany.toParReduceMany h1
+  have h2' := ReduceMany.toParReduceMany h2
+  have ⟨t', h1t', h2t'⟩ := ParReduceMany.confluence h1' h2'
+  use t'
+  exact ⟨ParReduceMany.toReduceMany h1t', ParReduceMany.toReduceMany h2t'⟩
 
 /-
 Voila! Starting from zero, and building up intermediate results, we have finally established the confluence of `~~>*`!
