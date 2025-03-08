@@ -165,14 +165,21 @@ theorem ParReduce.triangle'
   t1 ~~>p t.norm := by
   induction hr
   case var => apply ParReduce.refl
-  case beta t u t' u' hr1 ih1 hr2 ih2 =>
+  case beta =>
     apply ParReduce.subst_zero
     repeat assumption
-  case ctx_abs t t' hr ih =>
+  case ctx_abs =>
     constructor
-    apply ih
+    assumption
   case ctx_app t t' u u' hr1 ih1 hr2 ih2 =>
-    sorry
+    cases hr1 <;> simp [Term.norm] at *
+    · constructor <;> assumption
+    · constructor <;> assumption
+    · constructor
+      · cases hr2
+        assumption
+      · assumption
+    · constructor <;> assumption
 
 theorem ParReduce.triangle : ParReduce.Triangle := by
   intro t t' h
@@ -237,12 +244,22 @@ theorem ReduceMany.ctx_abs
 theorem ReduceMany.ctx_app1
   (h1 : t1 ~~>* t1') :
   .t_app t1 t2 ~~>* .t_app t1' t2 := by
-  sorry
+  induction h1 with
+  | refl => constructor
+  | tail h1 ht ih =>
+    apply Relation.ReflTransGen.tail ih
+    constructor
+    assumption
 
 theorem ReduceMany.ctx_app2
   (h2 : t2 ~~>* t2') :
   .t_app t1 t2 ~~>* .t_app t1 t2' := by
-  sorry
+  induction h2 with
+  | refl => constructor
+  | tail h2 ht ih =>
+    apply Relation.ReflTransGen.tail ih
+    constructor
+    assumption
 
 /-
 Now, prove that we can go from `~~>p` to `~~>*`.
