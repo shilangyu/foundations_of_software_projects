@@ -7,7 +7,7 @@ inductive Reduce : Term -> Term -> Prop
   | appAbs : Reduce (.t_app (.t_abs t) s) (t[s])
   | app1 : Reduce t1 t1' -> Reduce (.t_app t1 t2) (.t_app t1' t2)
   | app2 : Reduce t2 t2' -> Reduce (.t_app t1 t2) (.t_app t1 t2')
-  | abs : Reduce t1 t1' -> Reduce (.t_abs t) (.t_abs t')
+  | abs : Reduce t t' -> Reduce (.t_abs t) (.t_abs t')
 
 inductive Term.IsVal : Term -> Prop
   | abs : Term.IsVal (.t_abs t)
