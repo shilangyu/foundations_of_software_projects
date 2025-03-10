@@ -112,10 +112,12 @@ theorem Subst.lift_reduceTo
   (h : Subst.ReduceTo s1 s2) :
   Subst.ReduceTo (s1.lift) (s2.lift) := by
   intro i
-  induction i generalizing s1 s2
-  · apply ParReduce.refl
-  · simp [Subst.lift]
-    sorry
+  cases i with
+  | zero => exact ParReduce.refl
+  | succ n =>
+    simp [Subst.lift, Term.rename_toSubst]
+    apply ParReduce.subst_term
+    exact h n
 
 theorem ParReduce.subst
   (h1 : t ~~>p t')
