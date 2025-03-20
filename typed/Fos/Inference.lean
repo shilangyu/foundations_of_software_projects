@@ -13,41 +13,6 @@ def infer (env : List type) (t : Term) : Option type :=
     | .some (ty1 ⇒ ty2), .some ty1' => if ty1 = ty1' then .some ty2 else none
     | _, _ => none
 
-
-theorem lookup_idx {L : List α} {i : Nat} {x : α} [BEq α] : L[i]? = some x -> L.idxOf? x = some i := by
-  intro h
-  induction L generalizing i with
-  | nil => simp at h
-  | cons hd tl ih =>
-    have p := @List.getElem?_cons _ hd tl i
-    cases i with
-    | zero =>
-      simp at h
-      subst h
-      simp [List.idxOf?]
-      sorry
-    | succ i =>
-      simp at h
-      sorry
-
-
-theorem idx_lookup {L : List α} {i : Nat} {x : α} [BEq α] :  L.idxOf? x = some i -> L[i]? = some x := by
-  intro h
-  induction L generalizing i with
-  | nil => simp at h
-  | cons hd tl ih =>
-
-    cases i with
-    | zero =>
-      simp [List.idxOf?] at h
-      simp
-      sorry
-    | succ i =>
-      simp [List.idxOf?] at h
-      simp
-      sorry
-  sorry
-
 /- Prove `infer` produces the correct type. -/
 theorem infer_is_correct : ∀ t Γ ty, infer Γ t = .some ty -> Γ ⊢ t : ty := by
   intro t Γ ty h
@@ -55,7 +20,7 @@ theorem infer_is_correct : ∀ t Γ ty, infer Γ t = .some ty -> Γ ⊢ t : ty :
   | t_var x =>
     simp at h
     constructor
-    apply lookup_idx h
+    assumption
   | t_abs ty' t ih =>
     simp at h
     cases eq : infer (ty' :: Γ) t with
@@ -85,7 +50,6 @@ theorem infer_is_complete : ∀ t Γ ty, (Γ ⊢ t : ty) -> infer Γ t = .some t
   intro t Γ ty h
   induction h with
   | ty_var h =>
-    apply idx_lookup
     assumption
   | ty_abs h ih =>
     simp [ih]

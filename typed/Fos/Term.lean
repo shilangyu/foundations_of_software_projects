@@ -76,7 +76,7 @@ inductive has_ty : (List type) -> Term -> type -> Prop where
       has_ty (T1 :: Γ) t2 T2 ->
       has_ty Γ (Term.t_abs T1 t2) (T1 ⇒ T2)
   | ty_var :
-      Γ.idxOf? T = some x ->
+      Γ[x]? = some T ->
       has_ty Γ (Term.t_var x) T
   | ty_app :
       has_ty Γ t1 (T11 ⇒ T12) ->
