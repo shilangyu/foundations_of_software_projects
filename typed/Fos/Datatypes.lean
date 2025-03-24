@@ -11,16 +11,16 @@ namespace NiceParser
 def typeBool := ∘1 ⇒ ∘1 ⇒ ∘1
 
 def btrue : Term :=
-  elaborate (λ "t": ∘1 => λ "f": ∘1 => "t")
+  ```λt : ∘1 -> λf : ∘1 -> t```
 
 def bfalse : Term :=
-  elaborate (λ "t": ∘1 => λ "f": ∘1 => "f")
+  ```λt : ∘1 -> λf : ∘1 -> f```
 
 def or : Term :=
-  ```λa : {typeBool} -> λb : {typeBool} -> a {btrue} b```
+  ```λa : {typeBool} -> λb : {typeBool} -> λt : ∘1 -> λf : ∘1 -> b t (a t f)```
 
 def and : Term :=
-  ```λa : {typeBool} -> λb : {typeBool} -> a b {bfalse}```
+  ```λa : {typeBool} -> λb : {typeBool} -> λt : ∘1 -> λf : ∘1 -> b (a t f) f```
 
 def not : Term :=
   elaborate (λ "b": typeBool => λ "t": ∘1 => λ "f": ∘1 => "b"("f")("t"))
