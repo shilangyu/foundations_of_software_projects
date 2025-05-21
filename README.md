@@ -19,3 +19,7 @@ We prove confluence.
 The simply typed lambda calculus. We define some datatype (lists, booleans).
 
 We prove progress and correctness of inference.
+
+### CoC
+
+Proofs of statements using the calculus of constructions. Namely, not in tactic mode but pure lambda terms.
