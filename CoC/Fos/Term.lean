@@ -22,11 +22,15 @@ def LeibnizEq :=
   λ (α : Type _) (x y : α) =>
   ∀ (P : α → Prop), P x → P y
 
+theorem leibniz_refl : ∀ {α : Type _} {x : α}, LeibnizEq α x x :=
+  fun _ => fun hPx => hPx
+
 -- Question 2: Symmetry of Equality
 -- Write a lambda-term that has the following type
 theorem leibniz_symm : ∀ (α : Type _) (x y : α), LeibnizEq α x y -> LeibnizEq α y x :=
-  fun α => fun x => fun y => fun hXy =>
-    fun P => fun hPx => sorry
+  fun α => fun x => fun _ => fun hXy =>
+    hXy (fun z => LeibnizEq α z x) leibniz_refl
+
 
 -----------------------------------
 -- Existentials
